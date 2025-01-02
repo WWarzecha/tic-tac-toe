@@ -69,40 +69,46 @@ const game = function(){
     let player2 = createPlayer("player2", "X");
     let player1Move = true;
     let gameFinished = false;
+    let winner;
     const playRound = function(x, y){
         if(!gameFinished && !board.getSymbol(x, y)){
             if(player1Move){
                 board.setSymbol(x, y, player1.playerSymbol);
-                player1Move = false;
             }
             else{
                 board.setSymbol(x, y, player2.playerSymbol);
-                player1Move = true;
             }
             checkGameFinish();
+            player1Move = !player1Move;
         };
         return board.getSymbol(x, y);
     };
     const checkGameFinish = function(){
         if(board.checkWin()){
             gameFinished = true;
+            winner = (player1Move) ? player1.playerName : player2.playerName;
             console.log("Player with symbol: ", board.checkWin(), " won");
         }
         else if(board.isFull()){
-            console.log("It's a tie");
             gameFinished = true;
+            console.log("It's a tie");
         }
     }
     const resetGame = () => {
         player1Move = true;
         gameFinished = false;
+        winner = null;
         board.reset();
     }
-    return {playRound, resetGame};
+    const isFinished = () => gameFinished;
+    const getWinner = () => winner;
+    return {playRound, resetGame, isFinished, getWinner};
 }();
 
 const DOMlogic = function(){
     let body = document.querySelector("body");
+
+    // Board
     let DOMboard = document.createElement("div");
     DOMboard.classList.add("board");
 
@@ -110,19 +116,39 @@ const DOMlogic = function(){
         for(let j = 0; j < 3; j++){
             let DOMfield = document.createElement("div");
             DOMfield.classList.add("field");
+            DOMfield.classList.add("unselectable");
             DOMfield.onclick = () => {
                 console.log(i, j);
                 DOMfield.textContent = game.playRound(i, j);
+                checkWinner();
             };
             DOMboard.appendChild(DOMfield);
         };
     };
 
     body.appendChild(DOMboard);
+    // Board end
+
+    // Winner modal
+    DOMmodal = document.createElement("div");
+    DOMmodal.classList.add("modal");
+    DOMmodal.onclick = () => DOMmodal.style.display = "none";
+
+    DOMmodal.textContent = "Player 1 WON";
+
+    body.appendChild(DOMmodal);
+
+    const checkWinner = function(){
+        if(game.isFinished()){
+            let winner = game.getWinner();
+            DOMmodal.textContent = (winner) ? `${winner} won the game!` : "It's a tie!";
+            DOMmodal.style.display = "block";
+        };
+    };
 
     const resetDOMFields = function(){
         DOMboard.childNodes.forEach((DOMfield) => DOMfield.textContent = null);
         game.resetGame();
-    }
+    };
     return {resetDOMFields};
 }();
