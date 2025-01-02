@@ -1,5 +1,6 @@
 const board = function(){
     // generate 3x3 matrix filled with zeros
+    // let fields = [...Array(3).keys().map(() => [...Array(3).keys().map(() => null)])];
     let fields = [...Array(3).keys().map(() => [...Array(3).keys().map(() => null)])];
 
     const setSymbol = function(x, y, symbol){
@@ -52,7 +53,7 @@ const board = function(){
 
     const logBoard = () => console.log(fields);
 
-    const reset = () => fields.forEach((row) => row.map(() => null));
+    const reset = () => fields = [...Array(3).keys().map(() => [...Array(3).keys().map(() => null)])];
 
     return {setSymbol, getSymbol, logBoard, isFull, checkWin, reset};
 }();
@@ -64,12 +65,12 @@ const createPlayer = function(name = "guest", symbol){
 };
 
 const game = function(){
-    let player1 = createPlayer("player1", "o");
-    let player2 = createPlayer("player2", "x");
+    let player1 = createPlayer("player1", "O");
+    let player2 = createPlayer("player2", "X");
     let player1Move = true;
     let gameFinished = false;
     const playRound = function(x, y){
-        if(!gameFinished){
+        if(!gameFinished && !board.getSymbol(x, y)){
             if(player1Move){
                 board.setSymbol(x, y, player1.playerSymbol);
                 player1Move = false;
@@ -80,6 +81,7 @@ const game = function(){
             }
             checkGameFinish();
         };
+        return board.getSymbol(x, y);
     };
     const checkGameFinish = function(){
         if(board.checkWin()){
@@ -91,8 +93,36 @@ const game = function(){
             gameFinished = true;
         }
     }
-    return {playRound};
+    const resetGame = () => {
+        player1Move = true;
+        gameFinished = false;
+        board.reset();
+    }
+    return {playRound, resetGame};
 }();
 
+const DOMlogic = function(){
+    let body = document.querySelector("body");
+    let DOMboard = document.createElement("div");
+    DOMboard.classList.add("board");
 
-// console.log();
+    for(let i = 0; i < 3; i++){
+        for(let j = 0; j < 3; j++){
+            let DOMfield = document.createElement("div");
+            DOMfield.classList.add("field");
+            DOMfield.onclick = () => {
+                console.log(i, j);
+                DOMfield.textContent = game.playRound(i, j);
+            };
+            DOMboard.appendChild(DOMfield);
+        };
+    };
+
+    body.appendChild(DOMboard);
+
+    const resetDOMFields = function(){
+        DOMboard.childNodes.forEach((DOMfield) => DOMfield.textContent = null);
+        game.resetGame();
+    }
+    return {resetDOMFields};
+}();
