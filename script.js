@@ -183,14 +183,17 @@ const DOMlogic = function(){
         resetDOMFields();
         DOMmodal.style.display = "none";
     };
+    const DOMmodalText = document.createElement("div");
+
+    DOMmodal.appendChild(DOMmodalText);
 
     body.appendChild(DOMmodal);
 
     const checkWinner = function(){
         if(game.isFinished()){
             let winner = game.getWinner();
-            DOMmodal.textContent = (winner) ? `${winner} won the game!` : "It's a tie!";
-            DOMmodal.style.display = "block";
+            DOMmodalText.textContent = (winner) ? `${winner} won the game!` : "It's a tie!";
+            DOMmodal.style.display = "flex";
         };
     };
 
