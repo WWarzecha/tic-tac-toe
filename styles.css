@@ -21,6 +21,10 @@ body {
     align-items: center;
 }
 
+.name-input {
+    width: 10rem;
+}
+
 
 .board {
     display: flex;

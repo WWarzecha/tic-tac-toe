@@ -58,15 +58,15 @@ const board = function(){
     return {setSymbol, getSymbol, logBoard, isFull, checkWin, reset};
 }();
 
-const createPlayer = function(name = "guest", symbol){
-    const playerName = name;
-    const playerSymbol = symbol;
+const player = function(name = "guest", symbol){
+    let playerName = name;
+    let playerSymbol = symbol;
     return {playerName, playerSymbol};
 };
 
 const game = function(){
-    let player1 = createPlayer("player1", "O");
-    let player2 = createPlayer("player2", "X");
+    let player1 = player("player1", "O");
+    let player2 = player("player2", "X");
     let player1Move = true;
     let gameFinished = false;
     let winner;
@@ -100,13 +100,49 @@ const game = function(){
         winner = null;
         board.reset();
     }
+
+    const setPlayerName = (playerNumber, newPlayerName) => {
+        if(playerNumber === 1){
+            player1.playerName = newPlayerName;
+        }
+        else{
+            player2.playerName = newPlayerName;
+        };
+    };
+
     const isFinished = () => gameFinished;
     const getWinner = () => winner;
-    return {playRound, resetGame, isFinished, getWinner};
+    return {playRound, resetGame, isFinished, getWinner, setPlayerName};
 }();
+
+const createPlayerDOM = (text, playerNumber, game) => {
+    const playerDOM = document.createElement("div");
+    playerDOM.textContent = text;
+
+    const playerNameInput = document.createElement("input");
+    playerNameInput.classList.add("name-input");
+    playerNameInput.type = "text";
+    playerNameInput.onblur = function(){
+        game.setPlayerName(playerNumber, playerNameInput.value.trim() || `Player${playerNumber}`);
+    };
+    playerDOM.appendChild(playerNameInput);
+
+    return {playerDOM};
+}
+
+
 
 const DOMlogic = function(){
     let body = document.querySelector("body");
+    // Players DOMS
+    player1DOM = createPlayerDOM("Player 1 name: ", 1, game);
+    player2DOM = createPlayerDOM("Player 2 name: ", 2, game);
+
+
+    body.appendChild(player1DOM.playerDOM);
+    body.appendChild(player2DOM.playerDOM);
+
+    // Players DOMS end
 
     // Board
     let DOMboard = document.createElement("div");
@@ -132,9 +168,10 @@ const DOMlogic = function(){
     // Winner modal
     DOMmodal = document.createElement("div");
     DOMmodal.classList.add("modal");
-    DOMmodal.onclick = () => DOMmodal.style.display = "none";
-
-    DOMmodal.textContent = "Player 1 WON";
+    DOMmodal.onclick = () => {
+        resetDOMFields();
+        DOMmodal.style.display = "none";
+    };
 
     body.appendChild(DOMmodal);
 
@@ -150,5 +187,7 @@ const DOMlogic = function(){
         DOMboard.childNodes.forEach((DOMfield) => DOMfield.textContent = null);
         game.resetGame();
     };
-    return {resetDOMFields};
+    // Winner modal end
+    // return {resetDOMFields};
 }();
+
