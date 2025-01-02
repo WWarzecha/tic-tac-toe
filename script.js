@@ -1,6 +1,5 @@
 const board = function(){
     // generate 3x3 matrix filled with zeros
-    // let fields = [...Array(3).keys().map(() => [...Array(3).keys().map(() => null)])];
     let fields = [...Array(3).keys().map(() => [...Array(3).keys().map(() => null)])];
 
     const setSymbol = function(x, y, symbol){
@@ -110,7 +109,9 @@ const game = function(){
 
     const isFinished = () => gameFinished;
     const getWinner = () => winner;
-    return {playRound, resetGame, isFinished, getWinner, setPlayerName};
+    const getCurrentPlayerSymbol = () => (player1Move) ? player1.playerSymbol : player2.playerSymbol;
+    const wasSet = (x, y) => board.getSymbol(x, y);
+    return {playRound, resetGame, isFinished, getWinner, setPlayerName, getCurrentPlayerSymbol, wasSet};
 }();
 
 const createPlayerDOM = (text, playerNumber, game) => {
@@ -152,7 +153,20 @@ const DOMlogic = function(){
             DOMfield.classList.add("unselectable");
             DOMfield.onclick = () => {
                 DOMfield.textContent = game.playRound(i, j);
+                DOMfield.classList.remove("hovered");
                 checkWinner();
+            };
+            DOMfield.onmouseenter = () => {
+                if(!game.wasSet(i, j)){
+                    DOMfield.classList.add("hovered");
+                    DOMfield.textContent = game.getCurrentPlayerSymbol();
+                };
+            };
+            DOMfield.onmouseleave = () => {
+                if(!game.wasSet(i, j)){
+                    DOMfield.textContent = null;
+                    DOMfield.classList.remove("hovered");
+                };
             };
             DOMboard.appendChild(DOMfield);
         };
@@ -195,4 +209,3 @@ const DOMlogic = function(){
     body.appendChild(restartButton);
     // Restart button end
 }();
-

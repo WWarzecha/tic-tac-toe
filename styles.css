@@ -41,7 +41,6 @@ body {
 
 .board {
     display: flex;
-    /* flex-direction: column; */
     width: calc(30rem + 4px);
     flex: 0 0 auto;
     flex-wrap: wrap;
@@ -59,6 +58,11 @@ body {
     vertical-align: center;
     font-size: 8rem;
     font-weight: 700;
+}
+
+.field.hovered {
+    background-color: rgb(0, 138, 138);
+    color: aqua;
 }
 
 .restart-button {
