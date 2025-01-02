@@ -87,11 +87,9 @@ const game = function(){
         if(board.checkWin()){
             gameFinished = true;
             winner = (player1Move) ? player1.playerName : player2.playerName;
-            console.log("Player with symbol: ", board.checkWin(), " won");
         }
         else if(board.isFull()){
             gameFinished = true;
-            console.log("It's a tie");
         }
     }
     const resetGame = () => {
@@ -117,11 +115,14 @@ const game = function(){
 
 const createPlayerDOM = (text, playerNumber, game) => {
     const playerDOM = document.createElement("div");
+    playerDOM.classList.add("player-div");
+    playerDOM.classList.add("unselectable");
     playerDOM.textContent = text;
 
     const playerNameInput = document.createElement("input");
     playerNameInput.classList.add("name-input");
     playerNameInput.type = "text";
+    playerNameInput.maxLength = 12;
     playerNameInput.onblur = function(){
         game.setPlayerName(playerNumber, playerNameInput.value.trim() || `Player${playerNumber}`);
     };
@@ -131,17 +132,13 @@ const createPlayerDOM = (text, playerNumber, game) => {
 }
 
 
-
 const DOMlogic = function(){
     let body = document.querySelector("body");
     // Players DOMS
     player1DOM = createPlayerDOM("Player 1 name: ", 1, game);
     player2DOM = createPlayerDOM("Player 2 name: ", 2, game);
-
-
     body.appendChild(player1DOM.playerDOM);
     body.appendChild(player2DOM.playerDOM);
-
     // Players DOMS end
 
     // Board
@@ -154,7 +151,6 @@ const DOMlogic = function(){
             DOMfield.classList.add("field");
             DOMfield.classList.add("unselectable");
             DOMfield.onclick = () => {
-                console.log(i, j);
                 DOMfield.textContent = game.playRound(i, j);
                 checkWinner();
             };
@@ -168,6 +164,7 @@ const DOMlogic = function(){
     // Winner modal
     DOMmodal = document.createElement("div");
     DOMmodal.classList.add("modal");
+    DOMmodal.classList.add("unselectable");
     DOMmodal.onclick = () => {
         resetDOMFields();
         DOMmodal.style.display = "none";
@@ -188,6 +185,14 @@ const DOMlogic = function(){
         game.resetGame();
     };
     // Winner modal end
-    // return {resetDOMFields};
+    // Restart button
+    let restartButton = document.createElement("button");
+    restartButton.classList.add("restart-button");
+    restartButton.classList.add("unselectable");
+    restartButton.textContent = "Restart";
+    restartButton.onclick = () => resetDOMFields();
+
+    body.appendChild(restartButton);
+    // Restart button end
 }();
 
